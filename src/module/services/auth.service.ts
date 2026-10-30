@@ -30,6 +30,14 @@ class AuthService {
             userId: user._id,
         };
     }
+
+    // Logout
+    async logout(userId: string) {
+        await this.userRepository.logout(userId);
+        return {
+            message: "Logout successful",
+        };
+    }
 }
 
 export default AuthService;
