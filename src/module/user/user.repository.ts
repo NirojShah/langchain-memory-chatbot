@@ -31,6 +31,22 @@ class UserRepository {
         });
     }
 
+    // Update user details
+    async update(userId: string, updateData: Partial<IUser>) {
+        return await User.findOneAndUpdate(
+            {
+                _id: userId,
+                isActive: true,
+            },
+            {
+                $set: updateData,
+            },
+            {
+                new: true,
+                runValidators: true,
+            }
+        );
+    }
 }
 
 export default new UserRepository();
