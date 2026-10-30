@@ -47,6 +47,22 @@ class UserRepository {
             }
         );
     }
+
+    // Deactivate user (soft delete)
+    async deactivate(userId: string) {
+        return await User.findOneAndUpdate(
+            {
+                _id: userId,
+                isActive: true,
+            },
+            {
+                $set: { isActive: false },
+            },
+            {
+                new: true,
+            }
+        );
+    }
 }
 
 export default new UserRepository();
