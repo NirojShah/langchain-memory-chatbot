@@ -14,6 +14,14 @@ class UserRepository {
             isActive: true,
         });
     }
+
+    // Find a user by email, including password for login
+    async findByEmailForAuth(email: string) {
+        return await User.findOne({
+            email: email.toLowerCase(),
+            isActive: true,
+        }).select("+password");
+    }
 }
 
 export default new UserRepository();
