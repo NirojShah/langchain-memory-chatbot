@@ -63,6 +63,17 @@ class UserRepository {
             }
         );
     }
+
+    // Logout by invalidating the stored refresh token
+    async logout(userId: string) {
+        return await User.findOneAndUpdate(
+            { _id: userId },
+            {
+                $unset: { refreshToken: 1 },
+            },
+            { new: true }
+        );
+    }
 }
 
 export default new UserRepository();
