@@ -64,6 +64,13 @@ class UserRepository {
         );
     }
 
+    // Find the user via email including Inactive Users.
+    async findByEmailIncludingInactive(email: string) {
+        return await User.findOne({
+            email: email
+        }).select("+email")
+    }
+
     // Logout by invalidating the stored refresh token
     async logout(userId: string) {
         return await User.findOneAndUpdate(
@@ -77,3 +84,4 @@ class UserRepository {
 }
 
 export default new UserRepository();
+export { UserRepository };
