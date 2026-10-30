@@ -22,6 +22,15 @@ class UserRepository {
             isActive: true,
         }).select("+password");
     }
+
+    // Find a user by ID
+    async findById(userId: string) {
+        return await User.findOne({
+            _id: userId,
+            isActive: true,
+        });
+    }
+
 }
 
 export default new UserRepository();
