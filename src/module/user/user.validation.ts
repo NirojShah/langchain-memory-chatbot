@@ -19,3 +19,12 @@ export const loginSchema = {
     },
 } as const;
 
+export const updateSchema = {
+    type: "object",
+    minProperties: 1,
+    additionalProperties: false,
+    properties: {
+        userName: { type: "string", minLength: 1, maxLength: 100 },
+        email: { type: "string", format: "email", maxLength: 254 },
+    },
+} as const;
