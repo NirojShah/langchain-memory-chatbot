@@ -29,7 +29,7 @@ class UserController {
     };
 
     getMe = async (request: FastifyRequest, reply: FastifyReply) => {
-        const userId = this.getAuthenticatedUserId(request);
+        const userId = await this.getAuthenticatedUserId(request);
         const result = await UserService.getUser(userId);
         return reply.send(result);
     };
@@ -38,24 +38,24 @@ class UserController {
         request: FastifyRequest<{ Body: UpdateUserDTO }>,
         reply: FastifyReply
     ) => {
-        const userId: string = this.getAuthenticatedUserId(request);
+        const userId: string = await this.getAuthenticatedUserId(request);
         const result = await UserService.updateUser(userId, request.body);
         return reply.send(result);
     };
 
     deactivateMe = async (request: FastifyRequest, reply: FastifyReply) => {
-        const userId: string = this.getAuthenticatedUserId(request);
+        const userId: string = await this.getAuthenticatedUserId(request);
         const result = await UserService.deactivateUser(userId);
         return reply.send(result);
     };
 
     logout = async (request: FastifyRequest, reply: FastifyReply) => {
-        const userId = this.getAuthenticatedUserId(request);
+        const userId = await this.getAuthenticatedUserId(request);
         const result = await UserService.logout(userId);
         return reply.send(result);
     };
 
-    private getAuthenticatedUserId(request: FastifyRequest) {
+    private async getAuthenticatedUserId(request: FastifyRequest): Promise<string> {
         const authorization = request.headers.authorization;
         const token = authorization?.match(/^Bearer\s+(\S+)$/i)?.[1];
 
@@ -63,7 +63,7 @@ class UserController {
             throw CustomError.unauthorized("Bearer access token is required");
         }
 
-        return AuthService.verifyAccessToken(token);
+        return await AuthService.verifyAccessToken(token);
     }
 }
 
