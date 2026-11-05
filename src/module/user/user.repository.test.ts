@@ -45,11 +45,11 @@ describe("UserRepository", () => {
 
     describe("findByEmailForAuth", () => {
         it("should find active user and include password field", async () => {
-            const mockSelect = jest.fn().mockResolvedValue({
+            const mockSelect = (jest.fn() as any).mockResolvedValue({
                 _id: "64f1a2b3c4d5e6f7a8b9c0d1",
                 email: "test@example.com",
                 password: "hashedpassword",
-            } as any);
+            });
 
             jest.spyOn(User, "findOne").mockReturnValue({
                 select: mockSelect,
@@ -145,11 +145,11 @@ describe("UserRepository", () => {
 
     describe("findByEmailIncludingInactive", () => {
         it("should find user by email including inactive and select email field", async () => {
-            const mockSelect = jest.fn().mockResolvedValue({
+            const mockSelect = (jest.fn() as any).mockResolvedValue({
                 _id: "64f1a2b3c4d5e6f7a8b9c0d1",
                 email: "inactive@example.com",
                 isActive: false,
-            } as any);
+            });
 
             jest.spyOn(User, "findOne").mockReturnValue({
                 select: mockSelect,
