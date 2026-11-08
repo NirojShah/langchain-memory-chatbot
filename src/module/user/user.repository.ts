@@ -10,7 +10,7 @@ class UserRepository {
     // Find a user by email
     async findByEmail(email: string) {
         return await User.findOne({
-            email: email.toLowerCase(),
+            email: email.trim().toLowerCase(),
             isActive: true,
         });
     }
@@ -18,7 +18,7 @@ class UserRepository {
     // Find a user by email, including password for login
     async findByEmailForAuth(email: string) {
         return await User.findOne({
-            email: email.toLowerCase(),
+            email: email.trim().toLowerCase(),
             isActive: true,
         }).select("+password");
     }
@@ -57,6 +57,7 @@ class UserRepository {
             },
             {
                 $set: { isActive: false },
+                $unset: { refreshTokenHash: 1 },
             },
             {
                 new: true,
@@ -67,8 +68,25 @@ class UserRepository {
     // Find the user via email including Inactive Users.
     async findByEmailIncludingInactive(email: string) {
         return await User.findOne({
-            email: email
-        }).select("+email")
+            email: email.trim().toLowerCase(),
+        });
+    }
+
+    // Replace the user's active refresh token.
+    async setRefreshTokenHash(userId: string, refreshTokenHash: string) {
+        return await User.findOneAndUpdate(
+            {
+                _id: userId,
+                isActive: true,
+            },
+            {
+                $set: { refreshTokenHash },
+            },
+            {
+                new: true,
+                runValidators: true,
+            }
+        );
     }
 
     // Logout by invalidating the stored refresh token
@@ -76,7 +94,7 @@ class UserRepository {
         return await User.findOneAndUpdate(
             { _id: userId },
             {
-                $unset: { refreshToken: 1 },
+                $unset: { refreshTokenHash: 1 },
             },
             { new: true }
         );
