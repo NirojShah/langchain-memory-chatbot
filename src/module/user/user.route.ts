@@ -4,7 +4,11 @@ import type {
     UpdateUserDTO,
 } from "./user.datatype.js";
 import UserController from "./user.controller.js";
-import { loginSchema, registerSchema, updateSchema } from "./user.validation.js";
+import {
+    loginSchema,
+    registerSchema,
+    updateSchema,
+} from "./user.validation.js";
 
 const userRoutes: FastifyPluginAsync = async (app) => {
     app.post<{ Body: CreateUserDTO }>(

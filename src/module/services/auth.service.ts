@@ -1,17 +1,32 @@
 import bcrypt from "bcrypt";
-import type UserRepository from "../user/user.repository.js";
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+import { createHash, randomBytes } from "node:crypto";
+import UserRepository from "../user/user.repository.js";
+import { CustomError } from "../../utility/customError.js";
 
 class AuthService {
     constructor(
         private readonly userRepository: typeof UserRepository
-    ) { }
+    ) {}
 
     // Login
     async login(email: string, password: string) {
-        const user = await this.userRepository.findByEmailForAuth(email);
+        if (
+            typeof email !== "string" ||
+            !email.trim() ||
+            typeof password !== "string" ||
+            !password
+        ) {
+            throw CustomError.badRequest("Email and password are required");
+        }
+
+        const user = await this.userRepository.findByEmailForAuth(
+            email.trim().toLowerCase()
+        );
 
         if (!user) {
-            throw new Error("Invalid email or password");
+            throw CustomError.unauthorized("Invalid email or password");
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -20,19 +35,82 @@ class AuthService {
         );
 
         if (!isPasswordValid) {
-            throw new Error("Invalid email or password");
+            throw CustomError.unauthorized("Invalid email or password");
         }
 
-        // Generate access and refresh tokens here.
+        const accessSecret = process.env.JWT_ACCESS_SECRET;
+
+        if (!accessSecret) {
+            throw new Error("JWT_ACCESS_SECRET is not configured");
+        }
+
+        const accessToken = jwt.sign(
+            { sub: user._id.toString() },
+            accessSecret,
+            { expiresIn: "15m" }
+        );
+
+        const refreshToken = randomBytes(32).toString("hex");
+        const refreshTokenHash = createHash("sha256")
+            .update(refreshToken)
+            .digest("hex");
+
+        const updatedUser = await this.userRepository.setRefreshTokenHash(
+            user._id.toString(),
+            refreshTokenHash
+        );
+
+        if (!updatedUser) {
+            throw CustomError.unauthorized("Invalid email or password");
+        }
 
         return {
             message: "Login successful",
-            userId: user._id,
+            user: {
+                id: user._id,
+                userName: user.userName,
+                email: user.email,
+            },
+            accessToken,
+            refreshToken,
         };
+    }
+
+    verifyAccessToken(token: string) {
+        const accessSecret = process.env.JWT_ACCESS_SECRET;
+
+        if (!accessSecret) {
+            throw new Error("JWT_ACCESS_SECRET is not configured");
+        }
+
+        let payload: string | jwt.JwtPayload;
+
+        try {
+            payload = jwt.verify(token, accessSecret);
+        } catch {
+            throw CustomError.unauthorized("Invalid or expired access token");
+        }
+
+        if (
+            typeof payload === "string" ||
+            typeof payload.sub !== "string" ||
+            !mongoose.isValidObjectId(payload.sub)
+        ) {
+            throw CustomError.unauthorized("Invalid or expired access token");
+        }
+
+        return payload.sub;
     }
 
     // Logout
     async logout(userId: string) {
+        if (
+            typeof userId !== "string" ||
+            !mongoose.isValidObjectId(userId)
+        ) {
+            throw CustomError.badRequest("Invalid user ID");
+        }
+
         await this.userRepository.logout(userId);
         return {
             message: "Logout successful",
@@ -40,4 +118,4 @@ class AuthService {
     }
 }
 
-export default AuthService;
+export default new AuthService(UserRepository);

@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 
 import UserRepository from "./user.repository.js";
-import AuthService from "../../auth/auth.service.js";
+import AuthService from "../services/auth.service.js";
 import type {
     CreateUserDTO,
     UpdateUserDTO,
