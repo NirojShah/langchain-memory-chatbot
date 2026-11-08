@@ -23,8 +23,6 @@ class ChatRepository implements ChatRepositoryI {
             { $limit: limit }
         ]);
     }
-
-
 }
 
 export default ChatRepository;
