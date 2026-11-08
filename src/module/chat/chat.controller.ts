@@ -26,4 +26,6 @@ class ChatController {
     }
 }
 
-export default ChatController;
+export {
+    ChatController
+}
