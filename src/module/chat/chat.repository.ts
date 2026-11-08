@@ -25,4 +25,7 @@ class ChatRepository implements ChatRepositoryI {
     }
 }
 
-export default ChatRepository;
+export default new ChatRepository;
+export {
+    ChatRepository
+}
