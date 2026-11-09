@@ -668,4 +668,61 @@ describe("User Module API & Unit Tests", () => {
             );
         });
     });
+
+    describe("DELETE /users/me - API & User Deactivation", () => {
+        it("should deactivate user successfully and return 200", async () => {
+            const token = createValidToken(VALID_USER_ID);
+            mock.method(UserRepository, "deactivate", async () => ({
+                _id: VALID_USER_ID,
+                isActive: false,
+            }));
+
+            const response = await app.inject({
+                method: "DELETE",
+                url: "/users/me",
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+            });
+
+            assert.equal(response.statusCode, 200);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "User deactivated successfully");
+        });
+
+        it("should return 401 Unauthorized when token is missing", async () => {
+            const response = await app.inject({
+                method: "DELETE",
+                url: "/users/me",
+            });
+
+            assert.equal(response.statusCode, 401);
+        });
+
+        it("should return 404 Not Found when user does not exist or is already inactive", async () => {
+            const token = createValidToken(VALID_USER_ID);
+            mock.method(UserRepository, "deactivate", async () => null);
+
+            const response = await app.inject({
+                method: "DELETE",
+                url: "/users/me",
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+            });
+
+            assert.equal(response.statusCode, 404);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "User not found or already inactive");
+        });
+    });
+
+    describe("UserService.deactivateUser - Unit Tests", () => {
+        it("deactivateUser throws 400 if userId is invalid", async () => {
+            await assert.rejects(
+                () => UserService.deactivateUser("not-valid-id"),
+                (err: any) => err.statusCode === 400 && err.message === "Invalid user ID"
+            );
+        });
+    });
 });
