@@ -725,4 +725,44 @@ describe("User Module API & Unit Tests", () => {
             );
         });
     });
+
+    describe("POST /users/logout - API & Logout", () => {
+        it("should logout successfully and return 200", async () => {
+            const token = createValidToken(VALID_USER_ID);
+            mock.method(UserRepository, "logout", async () => ({
+                _id: VALID_USER_ID,
+            }));
+
+            const response = await app.inject({
+                method: "POST",
+                url: "/users/logout",
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+            });
+
+            assert.equal(response.statusCode, 200);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "Logout successful");
+        });
+
+        it("should return 401 Unauthorized when token is missing", async () => {
+            const response = await app.inject({
+                method: "POST",
+                url: "/users/logout",
+            });
+
+            assert.equal(response.statusCode, 401);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "Bearer access token is required");
+        });
+    });
+
+    describe("UserService.logout - Unit Tests", () => {
+        it("logout delegates to AuthService.logout", async () => {
+            mock.method(UserRepository, "logout", async () => ({ _id: VALID_USER_ID }));
+            const result = await UserService.logout(VALID_USER_ID);
+            assert.equal(result.message, "Logout successful");
+        });
+    });
 });
