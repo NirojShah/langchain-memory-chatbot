@@ -4,6 +4,7 @@ import { describe, it, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { mock } from "node:test";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 import app from "../src/app.js";
@@ -15,6 +16,10 @@ import UserController from "../src/module/user/user.controller.js";
 app.log.level = "silent";
 
 const VALID_USER_ID = "507f1f77bcf86cd799439011";
+
+const createValidToken = (userId: string = VALID_USER_ID, expiresIn: string = "15m") => {
+    return jwt.sign({ sub: userId }, process.env.JWT_ACCESS_SECRET!, { expiresIn });
+};
 
 describe("User Module API & Unit Tests", () => {
     afterEach(() => {
@@ -372,6 +377,132 @@ describe("User Module API & Unit Tests", () => {
             await UserController.login(request, reply);
             assert.equal(sentBody.message, "Login successful");
             assert.equal(sentBody.accessToken, "token123");
+        });
+    });
+
+    describe("GET /users/me - API & Profile Retrieval", () => {
+        it("should return 200 with user profile when valid Bearer token is provided", async () => {
+            const token = createValidToken(VALID_USER_ID);
+            mock.method(UserRepository, "findById", async (id: string) => ({
+                _id: id,
+                userName: "JaneDoe",
+                email: "jane@example.com",
+                isActive: true,
+                createdAt: new Date("2026-01-01T00:00:00.000Z"),
+                updatedAt: new Date("2026-01-02T00:00:00.000Z"),
+            }));
+
+            const response = await app.inject({
+                method: "GET",
+                url: "/users/me",
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+            });
+
+            assert.equal(response.statusCode, 200);
+            const body = JSON.parse(response.body);
+            assert.equal(body.id, VALID_USER_ID);
+            assert.equal(body.userName, "JaneDoe");
+            assert.equal(body.email, "jane@example.com");
+            assert.equal(body.isActive, true);
+        });
+
+        it("should return 401 Unauthorized when Authorization header is missing", async () => {
+            const response = await app.inject({
+                method: "GET",
+                url: "/users/me",
+            });
+
+            assert.equal(response.statusCode, 401);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "Bearer access token is required");
+        });
+
+        it("should return 401 Unauthorized when Authorization header is not Bearer", async () => {
+            const response = await app.inject({
+                method: "GET",
+                url: "/users/me",
+                headers: {
+                    authorization: "Basic dXNlcjpwYXNz",
+                },
+            });
+
+            assert.equal(response.statusCode, 401);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "Bearer access token is required");
+        });
+
+        it("should return 401 Unauthorized when token is invalid or malformed", async () => {
+            const response = await app.inject({
+                method: "GET",
+                url: "/users/me",
+                headers: {
+                    authorization: "Bearer invalid-token-string",
+                },
+            });
+
+            assert.equal(response.statusCode, 401);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "Invalid or expired access token");
+        });
+
+        it("should return 401 Unauthorized when token has expired", async () => {
+            const expiredToken = createValidToken(VALID_USER_ID, "-1s");
+
+            const response = await app.inject({
+                method: "GET",
+                url: "/users/me",
+                headers: {
+                    authorization: `Bearer ${expiredToken}`,
+                },
+            });
+
+            assert.equal(response.statusCode, 401);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "Invalid or expired access token");
+        });
+
+        it("should return 404 Not Found when user is not found or inactive", async () => {
+            const token = createValidToken(VALID_USER_ID);
+            mock.method(UserRepository, "findById", async () => null);
+
+            const response = await app.inject({
+                method: "GET",
+                url: "/users/me",
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+            });
+
+            assert.equal(response.statusCode, 404);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "User not found");
+        });
+
+        it("should return 400 Bad Request when decoded userId is not a valid ObjectId", async () => {
+            const token = jwt.sign({ sub: "invalid-user-id" }, process.env.JWT_ACCESS_SECRET!, { expiresIn: "15m" });
+
+            const response = await app.inject({
+                method: "GET",
+                url: "/users/me",
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+            });
+
+            assert.equal(response.statusCode, 400);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "Invalid user ID");
+        });
+    });
+
+    describe("UserService.getUser - Unit Tests", () => {
+        it("getUser throws 400 if userId is not a valid ObjectId", async () => {
+            await assert.rejects(
+                () => UserService.getUser("invalid-id"),
+                (err: any) => err.statusCode === 400 && err.message === "Invalid user ID"
+            );
         });
     });
 });
