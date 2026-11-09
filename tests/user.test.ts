@@ -16,6 +16,7 @@ import UserController from "../src/module/user/user.controller.js";
 app.log.level = "silent";
 
 const VALID_USER_ID = "507f1f77bcf86cd799439011";
+const OTHER_USER_ID = "507f191e810c19729de860ea";
 
 const createValidToken = (userId: string = VALID_USER_ID, expiresIn: string = "15m") => {
     return jwt.sign({ sub: userId }, process.env.JWT_ACCESS_SECRET!, { expiresIn });
@@ -502,6 +503,168 @@ describe("User Module API & Unit Tests", () => {
             await assert.rejects(
                 () => UserService.getUser("invalid-id"),
                 (err: any) => err.statusCode === 400 && err.message === "Invalid user ID"
+            );
+        });
+    });
+
+    describe("PATCH /users/me - API & Profile Updates", () => {
+        it("should update userName successfully and return 200", async () => {
+            const token = createValidToken(VALID_USER_ID);
+            mock.method(UserRepository, "update", async (id: string, updates: any) => ({
+                _id: id,
+                userName: updates.userName,
+                email: "jane@example.com",
+                updatedAt: new Date("2026-01-03T00:00:00.000Z"),
+            }));
+
+            const response = await app.inject({
+                method: "PATCH",
+                url: "/users/me",
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+                payload: {
+                    userName: "Jane Updated",
+                },
+            });
+
+            assert.equal(response.statusCode, 200);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "User updated successfully");
+            assert.equal(body.user.userName, "Jane Updated");
+        });
+
+        it("should update email successfully when email is not taken", async () => {
+            const token = createValidToken(VALID_USER_ID);
+            mock.method(UserRepository, "findByEmail", async () => null);
+            mock.method(UserRepository, "update", async (id: string, updates: any) => ({
+                _id: id,
+                userName: "JaneDoe",
+                email: updates.email,
+                updatedAt: new Date(),
+            }));
+
+            const response = await app.inject({
+                method: "PATCH",
+                url: "/users/me",
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+                payload: {
+                    email: "jane.new@example.com",
+                },
+            });
+
+            assert.equal(response.statusCode, 200);
+            const body = JSON.parse(response.body);
+            assert.equal(body.user.email, "jane.new@example.com");
+        });
+
+        it("should fail with 400 when payload is empty (minProperties: 1)", async () => {
+            const token = createValidToken(VALID_USER_ID);
+
+            const response = await app.inject({
+                method: "PATCH",
+                url: "/users/me",
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+                payload: {},
+            });
+
+            assert.equal(response.statusCode, 400);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "Validation Error");
+        });
+
+        it("should return 409 Conflict when updating to an email already in use by another user", async () => {
+            const token = createValidToken(VALID_USER_ID);
+            mock.method(UserRepository, "findByEmail", async () => ({
+                _id: { toString: () => OTHER_USER_ID },
+                email: "other@example.com",
+            }));
+
+            const response = await app.inject({
+                method: "PATCH",
+                url: "/users/me",
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+                payload: {
+                    email: "other@example.com",
+                },
+            });
+
+            assert.equal(response.statusCode, 409);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "Email is already in use");
+        });
+
+        it("should return 409 Conflict when database raises duplicate key error (code 11000) during update", async () => {
+            const token = createValidToken(VALID_USER_ID);
+            mock.method(UserRepository, "findByEmail", async () => null);
+            mock.method(UserRepository, "update", async () => {
+                const error = new Error("Duplicate key") as any;
+                error.code = 11000;
+                throw error;
+            });
+
+            const response = await app.inject({
+                method: "PATCH",
+                url: "/users/me",
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+                payload: {
+                    email: "conflict@example.com",
+                },
+            });
+
+            assert.equal(response.statusCode, 409);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "Email is already in use");
+        });
+
+        it("should return 404 Not Found if user to update does not exist or is inactive", async () => {
+            const token = createValidToken(VALID_USER_ID);
+            mock.method(UserRepository, "update", async () => null);
+
+            const response = await app.inject({
+                method: "PATCH",
+                url: "/users/me",
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+                payload: {
+                    userName: "JaneDoe",
+                },
+            });
+
+            assert.equal(response.statusCode, 404);
+            const body = JSON.parse(response.body);
+            assert.equal(body.message, "User not found or inactive");
+        });
+    });
+
+    describe("UserService.updateUser - Unit Tests", () => {
+        it("updateUser throws 400 if empty object or no valid fields are provided", async () => {
+            await assert.rejects(
+                () => UserService.updateUser(VALID_USER_ID, {}),
+                (err: any) => err.statusCode === 400 && err.message === "No valid fields provided for update"
+            );
+        });
+
+        it("updateUser throws 400 if userName is empty whitespace", async () => {
+            await assert.rejects(
+                () => UserService.updateUser(VALID_USER_ID, { userName: "   " }),
+                (err: any) => err.statusCode === 400 && err.message === "Username cannot be empty"
+            );
+        });
+
+        it("updateUser throws 400 if email is empty whitespace", async () => {
+            await assert.rejects(
+                () => UserService.updateUser(VALID_USER_ID, { email: "   " }),
+                (err: any) => err.statusCode === 400 && err.message === "Email cannot be empty"
             );
         });
     });
