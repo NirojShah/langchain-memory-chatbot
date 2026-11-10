@@ -2,6 +2,7 @@ import type { MessageRepository } from "./message.repository.js";
 
 interface MessageServiceI {
     createNewMessage(chatId: string, userId: string, content: string): Promise<any>;
+    getMessagesByChatId(chatId: string, page: number, limit: number): Promise<any>;
 }
 
 class MessageService implements MessageServiceI {
@@ -14,6 +15,12 @@ class MessageService implements MessageServiceI {
         }
     }
 
+    async getMessagesByChatId(chatId: string, page: number, limit: number): Promise<any> {
+        const response = await this.messageRepository.fetchMessagesByChatId(chatId, page, limit);
+        if (response) {
+            return response;
+        }
+    }
 }
 
 export {
