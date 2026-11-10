@@ -12,6 +12,18 @@ class MessageController {
         const result = await this.messageService.createNewMessage(chatId, userId, content);
         reply.send(result);
     }
+
+    myMessages = async (
+        request: FastifyRequest<{ Params: { chatId: string }, Querystring: { page: number, limit: number } }>,
+        reply: FastifyReply
+    ) => {
+        const chatId = request.params.chatId;
+        const page = request.query.page || 1;
+        const limit = request.query.limit || 10;
+
+        const result = await this.messageService.getMessagesByChatId(chatId, page, limit);
+        reply.send(result);
+    }
 }
 
 export {
