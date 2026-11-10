@@ -18,6 +18,20 @@ const messageRoutes: FastifyPluginAsync = async (app) => {
         messageController.newMessage
     );
 
+    app.get<{ Params: { chatId: string }, Querystring: { page: number, limit: number } }>(
+        "/messages/:chatId",
+        messageController.myMessages
+    );
+
+    app.get<{ Params: { chatId: string }, Querystring: { page: number, limit: number } }>(
+        "/chat-messages/:chatId",
+        messageController.myMessages
+    );
+
+    app.get<{ Params: { chatId: string }, Querystring: { page: number, limit: number } }>(
+        "/my-messages/:chatId",
+        messageController.myMessages
+    );
 };
 
 export default messageRoutes;
