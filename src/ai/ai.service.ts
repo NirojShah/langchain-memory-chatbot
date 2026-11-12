@@ -1,6 +1,8 @@
 import type { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { BaseListChatMessageHistory } from "@langchain/core/chat_history";
 import { type BaseMessage, HumanMessage, AIMessage, isAIMessage } from "@langchain/core/messages";
+import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
+import { RunnableWithMessageHistory } from "@langchain/core/runnables";
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import Message from "../module/message/message.model.js";
@@ -169,4 +171,59 @@ export class ChatHistoryFactory {
  */
 export const createChatHistory = (chatId: string, options?: ChatHistoryOptions): MongoChatMessageHistory => {
     return ChatHistoryFactory.createHistory(chatId, options);
+};
+
+export interface ConversationChainOptions {
+    model?: BaseChatModel;
+    modelConfig?: ModelConfig;
+    systemPrompt?: string;
+    userId?: string;
+    historyFactory?: (chatId: string) => BaseListChatMessageHistory;
+}
+
+/**
+ * Factory class for creating runnable chains with persistent chat message history
+ */
+export class ConversationChainFactory {
+    static createChain(options: ConversationChainOptions = {}): RunnableWithMessageHistory<any, any> {
+        const model = options.model || ChatModelFactory.createModel(options.modelConfig);
+        const modelName = ChatModelFactory.getModelName(model, options.modelConfig);
+
+        const systemPrompt =
+            options.systemPrompt ||
+            "You are a helpful, respectful, and intelligent AI assistant. Use the conversation history to provide contextual and coherent responses.";
+
+        const prompt = ChatPromptTemplate.fromMessages([
+            ["system", systemPrompt],
+            new MessagesPlaceholder("history"),
+            ["human", "{input}"],
+        ]);
+
+        const chain = prompt.pipe(model);
+
+        const historyFactory =
+            options.historyFactory ||
+            ((sessionId: string) => {
+                return ChatHistoryFactory.createHistory(sessionId, {
+                    ...(options.userId ? { userId: options.userId } : {}),
+                    modelName,
+                });
+            });
+
+        return new RunnableWithMessageHistory({
+            runnable: chain,
+            getMessageHistory: historyFactory,
+            inputMessagesKey: "input",
+            historyMessagesKey: "history",
+        });
+    }
+}
+
+/**
+ * Factory function to create a conversation chain with persistent history
+ */
+export const createConversationChain = (
+    options?: ConversationChainOptions
+): RunnableWithMessageHistory<any, any> => {
+    return ConversationChainFactory.createChain(options);
 };
