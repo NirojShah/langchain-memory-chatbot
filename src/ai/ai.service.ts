@@ -261,3 +261,70 @@ export const saveUserMessage = async (
         content,
     });
 };
+
+export interface SendMessageParams {
+    chatId: string;
+    message: string;
+    userId?: string;
+    modelConfig?: ModelConfig;
+    model?: BaseChatModel;
+    systemPrompt?: string;
+}
+
+export interface SendMessageResult {
+    reply: string;
+    model: string;
+    chatId: string;
+    sender: string;
+    aiMessageDoc?: any;
+}
+
+/**
+ * Sends a message, maintains conversation memory across turns,
+ * and saves the AI response to Message collection with model name as sender.
+ */
+export const sendMessage = async (params: SendMessageParams): Promise<SendMessageResult> => {
+    if (!params.chatId || typeof params.chatId !== "string" || !params.chatId.trim()) {
+        throw new Error("chatId is required");
+    }
+    if (!params.message || typeof params.message !== "string" || !params.message.trim()) {
+        throw new Error("message content is required");
+    }
+
+    const model = params.model || ChatModelFactory.createModel(params.modelConfig);
+    const modelName = ChatModelFactory.getModelName(model, params.modelConfig);
+
+    const chain = ConversationChainFactory.createChain({
+        model,
+        ...(params.modelConfig ? { modelConfig: params.modelConfig } : {}),
+        ...(params.systemPrompt ? { systemPrompt: params.systemPrompt } : {}),
+        ...(params.userId ? { userId: params.userId } : {}),
+    });
+
+    const response = await chain.invoke(
+        { input: params.message.trim() },
+        { configurable: { sessionId: params.chatId } }
+    );
+
+    const reply =
+        typeof response.content === "string"
+            ? response.content
+            : JSON.stringify(response.content);
+
+    let aiMessageDoc = await Message.findOne({
+        chatId: params.chatId,
+        sender: modelName,
+    }).sort({ createdAt: -1 });
+
+    if (!aiMessageDoc || aiMessageDoc.content !== reply) {
+        aiMessageDoc = await saveAiMessage(params.chatId, reply, modelName, params.userId);
+    }
+
+    return {
+        reply,
+        model: modelName,
+        chatId: params.chatId,
+        sender: modelName,
+        aiMessageDoc,
+    };
+};
