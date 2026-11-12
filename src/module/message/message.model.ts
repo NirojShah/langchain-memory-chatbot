@@ -10,6 +10,10 @@ const MessageSchema = new Schema<MessageModelType>({
         type: String,
         required: [true, "userId is required."],
     },
+    sender: {
+        type: String,
+        required: false,
+    },
     content: {
         type: String,
         required: [true, "content is required."],
