@@ -351,3 +351,84 @@ export const clearChatHistory = async (chatId: string): Promise<void> => {
     const history = ChatHistoryFactory.createHistory(chatId);
     await history.clear();
 };
+
+export interface AIServiceI {
+    createModel(config?: ModelConfig): BaseChatModel;
+    getChatHistory(chatId: string, options?: ChatHistoryOptions): MongoChatMessageHistory;
+    createConversationChain(options?: ConversationChainOptions): RunnableWithMessageHistory<any, any>;
+    saveAiMessage(chatId: string, content: string, modelName: string, userId?: string): Promise<any>;
+    saveUserMessage(chatId: string, content: string, userId: string): Promise<any>;
+    sendMessage(params: SendMessageParams): Promise<SendMessageResult>;
+    getChatMessages(chatId: string): Promise<BaseMessage[]>;
+    getStoredMessages(chatId: string): Promise<any[]>;
+    clearChatHistory(chatId: string): Promise<void>;
+}
+
+/**
+ * Main AI Service class coordinating chat memory persistence and LLM execution
+ */
+export class AIService implements AIServiceI {
+    constructor(
+        private readonly defaultModelConfig?: ModelConfig
+    ) {}
+
+    createModel(config?: ModelConfig): BaseChatModel {
+        return createChatModel(config || this.defaultModelConfig);
+    }
+
+    getChatHistory(chatId: string, options?: ChatHistoryOptions): MongoChatMessageHistory {
+        return createChatHistory(chatId, options);
+    }
+
+    createConversationChain(options?: ConversationChainOptions): RunnableWithMessageHistory<any, any> {
+        return createConversationChain({
+            ...(this.defaultModelConfig ? { modelConfig: this.defaultModelConfig } : {}),
+            ...options,
+        });
+    }
+
+    async saveAiMessage(chatId: string, content: string, modelName: string, userId?: string): Promise<any> {
+        return await saveAiMessage(chatId, content, modelName, userId);
+    }
+
+    async saveUserMessage(chatId: string, content: string, userId: string): Promise<any> {
+        return await saveUserMessage(chatId, content, userId);
+    }
+
+    async sendMessage(params: SendMessageParams): Promise<SendMessageResult> {
+        return await sendMessage({
+            ...(this.defaultModelConfig ? { modelConfig: this.defaultModelConfig } : {}),
+            ...params,
+        });
+    }
+
+    async getChatMessages(chatId: string): Promise<BaseMessage[]> {
+        return await getChatMessages(chatId);
+    }
+
+    async getStoredMessages(chatId: string): Promise<any[]> {
+        return await getStoredMessages(chatId);
+    }
+
+    async clearChatHistory(chatId: string): Promise<void> {
+        await clearChatHistory(chatId);
+    }
+}
+
+/**
+ * Factory class for creating AIService instances
+ */
+export class AIServiceFactory {
+    static createService(config?: ModelConfig): AIService {
+        return new AIService(config);
+    }
+}
+
+/**
+ * Factory function for creating AIService instances
+ */
+export const createAIService = (config?: ModelConfig): AIService => {
+    return AIServiceFactory.createService(config);
+};
+
+export default new AIService();
