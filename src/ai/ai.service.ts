@@ -227,3 +227,37 @@ export const createConversationChain = (
 ): RunnableWithMessageHistory<any, any> => {
     return ConversationChainFactory.createChain(options);
 };
+
+/**
+ * Persists an AI model response directly into the Message collection
+ * using the chatId and the AI model name as the sender.
+ */
+export const saveAiMessage = async (
+    chatId: string,
+    content: string,
+    modelName: string,
+    userId?: string
+): Promise<any> => {
+    return await Message.create({
+        chatId,
+        userId: userId || "ai",
+        sender: modelName,
+        content,
+    });
+};
+
+/**
+ * Persists a user message directly into the Message collection.
+ */
+export const saveUserMessage = async (
+    chatId: string,
+    content: string,
+    userId: string
+): Promise<any> => {
+    return await Message.create({
+        chatId,
+        userId,
+        sender: userId || "user",
+        content,
+    });
+};
