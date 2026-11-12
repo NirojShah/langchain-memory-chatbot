@@ -2,16 +2,17 @@ import type { MessageModelType } from "./message.datatype.js";
 import Message from "./message.model.js";
 
 interface MessageRepositoryI {
-    createNewMessage(chatId: string, userId: string, content: string): Promise<any>;
+    createNewMessage(chatId: string, userId: string, content: string, sender?: string): Promise<any>;
     fetchMessagesByChatId(chatId: string, page: number, limit: number): Promise<MessageModelType[]>;
 }
 
 class MessageRepository implements MessageRepositoryI {
-    async createNewMessage(chatId: string, userId: string, content: string) {
+    async createNewMessage(chatId: string, userId: string, content: string, sender?: string) {
         return await Message.create({
             chatId,
             userId,
             content,
+            sender: sender || userId,
         });
     }
 
