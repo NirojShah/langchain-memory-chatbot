@@ -328,3 +328,26 @@ export const sendMessage = async (params: SendMessageParams): Promise<SendMessag
         aiMessageDoc,
     };
 };
+
+/**
+ * Retrieves the persisted chat history as LangChain BaseMessage objects
+ */
+export const getChatMessages = async (chatId: string): Promise<BaseMessage[]> => {
+    const history = ChatHistoryFactory.createHistory(chatId);
+    return await history.getMessages();
+};
+
+/**
+ * Retrieves the raw persisted chat messages from MongoDB
+ */
+export const getStoredMessages = async (chatId: string): Promise<any[]> => {
+    return await Message.find({ chatId }).sort({ createdAt: 1 }).lean();
+};
+
+/**
+ * Clears/deletes all persistent chat history for the given chatId
+ */
+export const clearChatHistory = async (chatId: string): Promise<void> => {
+    const history = ChatHistoryFactory.createHistory(chatId);
+    await history.clear();
+};
