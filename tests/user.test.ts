@@ -19,7 +19,7 @@ const VALID_USER_ID = "507f1f77bcf86cd799439011";
 const OTHER_USER_ID = "507f191e810c19729de860ea";
 
 const createValidToken = (userId: string = VALID_USER_ID, expiresIn: string = "15m") => {
-    return jwt.sign({ sub: userId }, process.env.JWT_ACCESS_SECRET!, { expiresIn });
+    return jwt.sign({ sub: userId }, process.env.JWT_ACCESS_SECRET!, { expiresIn: expiresIn as any });
 };
 
 describe("User Module API & Unit Tests", () => {
