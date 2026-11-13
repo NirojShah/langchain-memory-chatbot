@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import { globalErrorHandler } from "./utility/errorHandler.js";
+import { OK, STATUS_MESSAGES } from "./utility/statusCodes.js";
 import appRouter from "./router/app.router.js";
 
 const app = Fastify({
@@ -7,11 +8,12 @@ const app = Fastify({
 });
 
 app.setErrorHandler(globalErrorHandler);
-app.register(appRouter)
+app.register(appRouter);
 
-app.get("/", async () => {
+app.get("/", async (_request, reply) => {
+    reply.code(OK.code);
     return {
-        message: "LangChain Memory Chatbot API is running!",
+        message: STATUS_MESSAGES.API_RUNNING,
     };
 });
 

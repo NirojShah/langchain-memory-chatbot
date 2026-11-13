@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import userRepository, { type UserRepository as UserRepositoryType } from "../module/user/user.repository.js";
 import { CustomError } from "../utility/customError.js";
+import { STATUS_MESSAGES } from "../utility/statusCodes.js";
 
 class AuthService {
     private readonly userRepository: UserRepositoryType = userRepository;
@@ -34,7 +35,7 @@ class AuthService {
             : undefined;
 
         return {
-            message: "Login successful",
+            message: STATUS_MESSAGES.LOGIN_SUCCESSFUL,
             user: {
                 id: user._id,
                 userName: user.userName,
@@ -72,7 +73,7 @@ class AuthService {
     async logout(userId: string) {
         await this.userRepository.logout(userId);
         return {
-            message: "Logout successful",
+            message: STATUS_MESSAGES.LOGOUT_SUCCESSFUL,
         };
     }
 }

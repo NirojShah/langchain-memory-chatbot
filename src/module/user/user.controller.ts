@@ -7,6 +7,7 @@ import type {
 } from "./user.datatype.js";
 import { CustomError } from "../../utility/customError.js";
 import AuthService from "../../auth/auth.service.js";
+import { CREATED, OK } from "../../utility/statusCodes.js";
 
 class UserController {
     register = async (
@@ -14,7 +15,7 @@ class UserController {
         reply: FastifyReply
     ) => {
         const result = await UserService.register(request.body);
-        return reply.code(201).send(result);
+        return reply.code(CREATED.code).send(result);
     };
 
     login = async (
@@ -25,13 +26,13 @@ class UserController {
     ) => {
         const { email, password } = request.body;
         const result = await UserService.login(email, password);
-        return reply.send(result);
+        return reply.code(OK.code).send(result);
     };
 
     getMe = async (request: FastifyRequest, reply: FastifyReply) => {
         const userId = await this.getAuthenticatedUserId(request);
         const result = await UserService.getUser(userId);
-        return reply.send(result);
+        return reply.code(OK.code).send(result);
     };
 
     updateMe = async (
@@ -40,19 +41,19 @@ class UserController {
     ) => {
         const userId: string = await this.getAuthenticatedUserId(request);
         const result = await UserService.updateUser(userId, request.body);
-        return reply.send(result);
+        return reply.code(OK.code).send(result);
     };
 
     deactivateMe = async (request: FastifyRequest, reply: FastifyReply) => {
         const userId: string = await this.getAuthenticatedUserId(request);
         const result = await UserService.deactivateUser(userId);
-        return reply.send(result);
+        return reply.code(OK.code).send(result);
     };
 
     logout = async (request: FastifyRequest, reply: FastifyReply) => {
         const userId = await this.getAuthenticatedUserId(request);
         const result = await UserService.logout(userId);
-        return reply.send(result);
+        return reply.code(OK.code).send(result);
     };
 
     private async getAuthenticatedUserId(request: FastifyRequest): Promise<string> {
