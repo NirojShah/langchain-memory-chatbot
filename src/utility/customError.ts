@@ -35,7 +35,8 @@ export class CustomError extends Error {
       message = typeof arg2 === "string" && arg2.trim().length > 0 ? arg2 : arg1.message;
     } else {
       message = typeof arg1 === "string" ? arg1 : "An error occurred";
-      statusCode = typeof arg2 === "number" ? arg2 : 500;
+      statusCode =
+        typeof arg2 === "number" ? arg2 : INTERNAL_SERVER_ERROR.code;
     }
 
     super(message);
