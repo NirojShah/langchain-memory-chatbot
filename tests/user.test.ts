@@ -365,6 +365,11 @@ describe("User Module API & Unit Tests", () => {
 
             let sentBody: any = null;
             const reply = {
+                code: () => ({
+                    send: (body: any) => {
+                        sentBody = body;
+                    },
+                }),
                 send: (b: any) => {
                     sentBody = b;
                     return reply;
