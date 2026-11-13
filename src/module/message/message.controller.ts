@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { MessageService } from "./message.service.js";
+import { OK } from "../../utility/statusCodes.js";
 
 class MessageController {
     constructor(private readonly messageService: MessageService) { }
@@ -10,7 +11,7 @@ class MessageController {
     ) => {
         const { chatId, userId, content } = request.body;
         const result = await this.messageService.createNewMessage(chatId, userId, content);
-        reply.send(result);
+        return reply.code(OK.code).send(result);
     }
 
     myMessages = async (
@@ -22,7 +23,7 @@ class MessageController {
         const limit = request.query.limit || 10;
 
         const result = await this.messageService.getMessagesByChatId(chatId, page, limit);
-        reply.send(result);
+        return reply.code(OK.code).send(result);
     }
 }
 
