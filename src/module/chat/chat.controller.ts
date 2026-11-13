@@ -1,6 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { ChatModelType } from "./chat.datatype.js";
 import type { ChatService } from "./chat.service.js";
+import { OK } from "../../utility/statusCodes.js";
 
 class ChatController {
     constructor(private readonly chatService: ChatService) { }
@@ -10,7 +11,7 @@ class ChatController {
     ) => {
         const userId: string = request.body.userId
         const result = await this.chatService.createNewChat(userId)
-        reply.send(result)
+        return reply.code(OK.code).send(result)
     }
 
     myChats = async (
@@ -22,7 +23,7 @@ class ChatController {
         const limit: number = request.query.limit || 10;
 
         const result = await this.chatService.getChatByUserId(userId, page, limit)
-        reply.send(result)
+        return reply.code(OK.code).send(result)
     }
 }
 
