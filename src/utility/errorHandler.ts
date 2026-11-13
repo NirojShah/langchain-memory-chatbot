@@ -1,5 +1,11 @@
 import type { FastifyError, FastifyReply, FastifyRequest } from "fastify";
 import { CustomError } from "./customError.js";
+import {
+  BAD_REQUEST,
+  INTERNAL_SERVER_ERROR,
+  STATUS_MESSAGES,
+  getStatusMessage,
+} from "./statusCodes.js";
 
 export const globalErrorHandler = (
   error: FastifyError | CustomError | Error,
@@ -17,14 +23,14 @@ export const globalErrorHandler = (
   }
 
   const fastifyError = error as FastifyError;
-  const statusCode = fastifyError.statusCode ?? 500;
+  const statusCode = fastifyError.statusCode ?? INTERNAL_SERVER_ERROR.code;
 
   // Handle Fastify schema validation errors
   if (fastifyError.validation) {
-    return reply.status(statusCode).send({
+    return reply.status(BAD_REQUEST.code).send({
       success: false,
-      statusCode,
-      message: "Validation Error",
+      statusCode: BAD_REQUEST.code,
+      message: STATUS_MESSAGES.VALIDATION_ERROR,
       errors: fastifyError.validation,
     });
   }
@@ -32,8 +38,8 @@ export const globalErrorHandler = (
   // Generic/Unknown errors
   const message =
     statusCode >= 500 && process.env.NODE_ENV === "production"
-      ? "Internal Server Error"
-      : error.message || "An unexpected error occurred";
+      ? getStatusMessage(INTERNAL_SERVER_ERROR.code)
+      : error.message || getStatusMessage(statusCode);
 
   return reply.status(statusCode).send({
     success: false,
