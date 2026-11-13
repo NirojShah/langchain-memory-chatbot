@@ -84,6 +84,11 @@ describe("Chat Module API & Unit Tests", () => {
 
             let sentData: any = null;
             const reply = {
+                code: () => ({
+                    send: (data: any) => {
+                        sentData = data;
+                    },
+                }),
                 send: (data: any) => {
                     sentData = data;
                 },
@@ -224,6 +229,11 @@ describe("Chat Module API & Unit Tests", () => {
 
             let sentData: any = null;
             const reply = {
+                code: () => ({
+                    send: (data: any) => {
+                        sentData = data;
+                    },
+                }),
                 send: (data: any) => {
                     sentData = data;
                 },
@@ -262,6 +272,11 @@ describe("Chat Module API & Unit Tests", () => {
 
             let sentData: any = null;
             const reply = {
+                code: () => ({
+                    send: (data: any) => {
+                        sentData = data;
+                    },
+                }),
                 send: (data: any) => {
                     sentData = data;
                 },
