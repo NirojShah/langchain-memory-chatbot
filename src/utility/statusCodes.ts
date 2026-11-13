@@ -84,3 +84,38 @@ export const STATUS_CODES = {
 } as const;
 
 export const StatusCodes = STATUS_CODES;
+
+export const STATUS_MESSAGES = {
+  API_RUNNING: "LangChain Memory Chatbot API is running!",
+  VALIDATION_ERROR: "Validation Error",
+  USER_REGISTERED: "User registered successfully",
+  USER_UPDATED: "User updated successfully",
+  USER_DEACTIVATED: "User deactivated successfully",
+  LOGIN_SUCCESSFUL: "Login successful",
+  LOGOUT_SUCCESSFUL: "Logout successful",
+} as const;
+
+const STATUS_MESSAGES_BY_CODE: Readonly<Record<number, string>> = {
+  [OK.code]: OK.message,
+  [CREATED.code]: CREATED.message,
+  [ACCEPTED.code]: ACCEPTED.message,
+  [NO_CONTENT.code]: NO_CONTENT.message,
+  [BAD_REQUEST.code]: BAD_REQUEST.message,
+  [UNAUTHORIZED.code]: UNAUTHORIZED.message,
+  [FORBIDDEN.code]: FORBIDDEN.message,
+  [NOT_FOUND.code]: NOT_FOUND.message,
+  [METHOD_NOT_ALLOWED.code]: METHOD_NOT_ALLOWED.message,
+  [REQUEST_TIMEOUT.code]: REQUEST_TIMEOUT.message,
+  [CONFLICT.code]: CONFLICT.message,
+  [GONE.code]: GONE.message,
+  [UNPROCESSABLE_ENTITY.code]: UNPROCESSABLE_ENTITY.message,
+  [TOO_MANY_REQUESTS.code]: TOO_MANY_REQUESTS.message,
+  [INTERNAL_SERVER_ERROR.code]: INTERNAL_SERVER_ERROR.message,
+  [NOT_IMPLEMENTED.code]: NOT_IMPLEMENTED.message,
+  [BAD_GATEWAY.code]: BAD_GATEWAY.message,
+  [SERVICE_UNAVAILABLE.code]: SERVICE_UNAVAILABLE.message,
+  [GATEWAY_TIMEOUT.code]: GATEWAY_TIMEOUT.message,
+};
+
+export const getStatusMessage = (code: number): string =>
+  STATUS_MESSAGES_BY_CODE[code] ?? INTERNAL_SERVER_ERROR.message;
