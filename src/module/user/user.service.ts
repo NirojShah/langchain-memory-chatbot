@@ -8,6 +8,7 @@ import type {
     UpdateUserDTO,
 } from "./user.datatype.js";
 import { CustomError } from "../../utility/customError.js";
+import { STATUS_MESSAGES } from "../../utility/statusCodes.js";
 
 class UserService {
     // Register a new user
@@ -55,7 +56,7 @@ class UserService {
             });
 
             return {
-                message: "User registered successfully",
+                message: STATUS_MESSAGES.USER_REGISTERED,
                 user: {
                     id: user._id,
                     userName: user.userName,
@@ -171,7 +172,7 @@ class UserService {
             }
 
             return {
-                message: "User updated successfully",
+                message: STATUS_MESSAGES.USER_UPDATED,
                 user: {
                     id: updatedUser._id,
                     userName: updatedUser.userName,
@@ -205,7 +206,7 @@ class UserService {
         }
 
         return {
-            message: "User deactivated successfully",
+            message: STATUS_MESSAGES.USER_DEACTIVATED,
         };
     }
 
