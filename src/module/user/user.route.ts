@@ -3,36 +3,39 @@ import type {
     CreateUserDTO,
     UpdateUserDTO,
 } from "./user.datatype.js";
-import UserController from "./user.controller.js";
+import { userContainer } from "./user.container.js";
+import { UserController } from "./user.controller.js";
 import {
     loginSchema,
     registerSchema,
     updateSchema,
 } from "./user.validation.js";
 
+const userController = userContainer.get(UserController);
+
 const userRoutes: FastifyPluginAsync = async (app) => {
     app.post<{ Body: CreateUserDTO }>(
         "/register",
         { schema: { body: registerSchema } },
-        UserController.register
+        userController.register
     );
 
     app.post<{ Body: Pick<CreateUserDTO, "email" | "password"> }>(
         "/login",
         { schema: { body: loginSchema } },
-        UserController.login
+        userController.login
     );
 
-    app.get("/me", UserController.getMe);
+    app.get("/me", userController.getMe);
 
     app.patch<{ Body: UpdateUserDTO }>(
         "/me",
         { schema: { body: updateSchema } },
-        UserController.updateMe
+        userController.updateMe
     );
 
-    app.delete("/me", UserController.deactivateMe);
-    app.post("/logout", UserController.logout);
+    app.delete("/me", userController.deactivateMe);
+    app.post("/logout", userController.logout);
 };
 
 export default userRoutes;
