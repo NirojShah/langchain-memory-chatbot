@@ -1,12 +1,11 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import userRepository, { type UserRepository as UserRepositoryType } from "../module/user/user.repository.js";
+import userRepository, { type UserRepository } from "../module/user/user.repository.js";
 import { CustomError } from "../utility/customError.js";
 import { STATUS_MESSAGES } from "../utility/statusCodes.js";
 
 class AuthService {
-    private readonly userRepository: UserRepositoryType = userRepository;
-    constructor() { }
+    constructor(private readonly userRepository: UserRepository) { }
 
     // Login
     async login(email: string, password: string) {
@@ -78,4 +77,5 @@ class AuthService {
     }
 }
 
-export default new AuthService();
+export default new AuthService(userRepository);
+export { AuthService };

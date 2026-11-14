@@ -1,11 +1,8 @@
 import type { FastifyPluginAsync } from "fastify";
-import { MessageRepository, MessageRepository as MessageRepositoryType } from "./message.repository.js";
-import { MessageService, MessageService as MessageServiceType } from "./message.service.js";
-import { MessageController as MessageControllerType, MessageController } from "./message.controller.js";
+import { messageContainer } from "./message.container.js";
+import { MessageController } from "./message.controller.js";
 
-const messageRepository: MessageRepositoryType = new MessageRepository();
-const messageService: MessageServiceType = new MessageService(messageRepository);
-const messageController: MessageControllerType = new MessageController(messageService);
+const messageController = messageContainer.get(MessageController);
 
 const messageRoutes: FastifyPluginAsync = async (app) => {
     app.post<{ Body: { chatId: string, userId: string, content: string } }>(

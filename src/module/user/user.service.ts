@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 
-import UserRepository from "./user.repository.js";
-import AuthService from "../services/auth.service.js";
+import UserRepositoryInstance, { type UserRepository } from "./user.repository.js";
+import AuthServiceInstance, { AuthService } from "../services/auth.service.js";
 import type {
     CreateUserDTO,
     UpdateUserDTO,
@@ -11,6 +11,11 @@ import { CustomError } from "../../utility/customError.js";
 import { STATUS_MESSAGES } from "../../utility/statusCodes.js";
 
 class UserService {
+    constructor(
+        private readonly userRepository: UserRepository,
+        private readonly authService: AuthService
+    ) { }
+
     // Register a new user
     async register(userData: CreateUserDTO) {
         const userName =
@@ -40,7 +45,7 @@ class UserService {
 
         // Check existing accounts, including inactive accounts.
         const existingUser =
-            await UserRepository.findByEmailIncludingInactive(email);
+            await this.userRepository.findByEmailIncludingInactive(email);
 
         if (existingUser) {
             throw CustomError.conflict("Email is already registered");
@@ -49,7 +54,7 @@ class UserService {
         const hashedPassword = await bcrypt.hash(password, 12);
 
         try {
-            const user = await UserRepository.create({
+            const user = await this.userRepository.create({
                 userName,
                 email,
                 password: hashedPassword,
@@ -83,13 +88,13 @@ class UserService {
 
     // Login an existing user
     async login(email: string, password: string) {
-        return AuthService.login(email, password);
+        return this.authService.login(email, password);
     }
 
     // Get an active user's profile
     async getUser(userId: string) {
         this.assertValidUserId(userId);
-        const user = await UserRepository.findById(userId);
+        const user = await this.userRepository.findById(userId);
 
         if (!user) {
             throw CustomError.notFound("User not found");
@@ -143,7 +148,7 @@ class UserService {
             }
 
             const existingUser =
-                await UserRepository.findByEmail(email);
+                await this.userRepository.findByEmail(email);
 
             if (
                 existingUser &&
@@ -162,7 +167,7 @@ class UserService {
         }
 
         try {
-            const updatedUser = await UserRepository.update(
+            const updatedUser = await this.userRepository.update(
                 userId,
                 updates
             );
@@ -197,7 +202,7 @@ class UserService {
     // Deactivate an account
     async deactivateUser(userId: string) {
         this.assertValidUserId(userId);
-        const user = await UserRepository.deactivate(userId);
+        const user = await this.userRepository.deactivate(userId);
 
         if (!user) {
             throw CustomError.notFound(
@@ -212,7 +217,7 @@ class UserService {
 
     // Logout an authenticated user
     async logout(userId: string) {
-        return AuthService.logout(userId);
+        return this.authService.logout(userId);
     }
 
     private assertValidUserId(userId: string) {
@@ -225,4 +230,5 @@ class UserService {
     }
 }
 
-export default new UserService();
+export default new UserService(UserRepositoryInstance, AuthServiceInstance);
+export { UserService };
