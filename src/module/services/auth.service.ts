@@ -2,13 +2,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { createHash, randomBytes } from "node:crypto";
-import UserRepository from "../user/user.repository.js";
+import UserRepositoryInstance, { type UserRepository } from "../user/user.repository.js";
 import { CustomError } from "../../utility/customError.js";
 import { STATUS_MESSAGES } from "../../utility/statusCodes.js";
 
 class AuthService {
     constructor(
-        private readonly userRepository: typeof UserRepository
+        private readonly userRepository: UserRepository
     ) {}
 
     // Login
@@ -119,4 +119,5 @@ class AuthService {
     }
 }
 
-export default new AuthService(UserRepository);
+export default new AuthService(UserRepositoryInstance);
+export { AuthService };
