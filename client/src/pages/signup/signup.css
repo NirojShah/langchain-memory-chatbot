@@ -1,0 +1,374 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Main Container */
+
+.signup-container {
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+  overflow: hidden;
+
+  padding: 40px 20px;
+
+  font-family: 'Inter', sans-serif;
+
+  background: linear-gradient(
+    135deg,
+    #090e24,
+    #172554,
+    #312e81,
+    #111827
+  );
+}
+
+/* Background Glowing Circles */
+
+.signup-container::before,
+.signup-container::after {
+  content: '';
+  position: absolute;
+
+  border-radius: 50%;
+  filter: blur(100px);
+
+  pointer-events: none;
+}
+
+.signup-container::before {
+  width: 350px;
+  height: 350px;
+
+  background: rgba(99, 102, 241, 0.5);
+
+  top: -100px;
+  left: -100px;
+}
+
+.signup-container::after {
+  width: 400px;
+  height: 400px;
+
+  background: rgba(56, 189, 248, 0.3);
+
+  bottom: -150px;
+  right: -100px;
+}
+
+/* Glass Card */
+
+.signup-glass-card {
+  width: 100%;
+  max-width: 450px;
+
+  padding: 40px;
+
+  position: relative;
+  z-index: 2;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+
+  animation: signupCardAppear 0.7s ease;
+}
+
+/* Header */
+
+.signup-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.signup-logo {
+  width: 60px;
+  height: 60px;
+
+  margin: 0 auto 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 30px;
+  color: white;
+
+  border-radius: 18px;
+
+  background: linear-gradient(
+    135deg,
+    #818cf8,
+    #6366f1
+  );
+
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+}
+
+.signup-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+
+  color: #ffffff;
+
+  margin-bottom: 10px;
+}
+
+.signup-header p {
+  font-size: 13px;
+  line-height: 1.6;
+
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Input Fields */
+
+.signup-input-group {
+  margin-bottom: 20px;
+}
+
+.signup-input-group label {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  margin-bottom: 10px;
+}
+
+.signup-input-group input {
+  width: 100%;
+  height: 50px;
+
+  padding: 0 16px;
+
+  outline: none;
+
+  color: white;
+  font-size: 13px;
+  font-family: inherit;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+
+  transition: all 0.3s ease;
+}
+
+.signup-input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.signup-input-group input:focus {
+  border-color: #818cf8;
+
+  background: rgba(255, 255, 255, 0.12);
+
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+}
+
+/* Password */
+
+.signup-password-wrapper {
+  position: relative;
+}
+
+.signup-password-wrapper input {
+  padding-right: 65px;
+}
+
+.signup-password-toggle {
+  position: absolute;
+
+  right: 14px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  background: none;
+  border: none;
+
+  color: #a5b4fc;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.signup-password-toggle:hover {
+  color: white;
+}
+
+/* Signup Button */
+
+.signup-button {
+  width: 100%;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  margin-top: 8px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: linear-gradient(
+    135deg,
+    #818cf8,
+    #6366f1
+  );
+
+  color: white;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+
+  transition: all 0.3s ease;
+}
+
+.signup-button span {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.signup-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 12px 25px rgba(99, 102, 241, 0.45);
+}
+
+.signup-button:hover span {
+  transform: translateX(5px);
+}
+
+.signup-button:active {
+  transform: scale(0.98);
+}
+
+/* Divider */
+
+.signup-divider {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  margin: 25px 0;
+
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 11px;
+}
+
+.signup-divider::before,
+.signup-divider::after {
+  content: '';
+
+  flex: 1;
+
+  height: 1px;
+
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Login Link */
+
+.signup-login-text {
+  text-align: center;
+
+  color: rgba(255, 255, 255, 0.65);
+
+  font-size: 12px;
+}
+
+.signup-login-text a {
+  color: #a5b4fc;
+
+  font-weight: 600;
+
+  text-decoration: none;
+
+  margin-left: 3px;
+
+  transition: 0.3s;
+}
+
+.signup-login-text a:hover {
+  color: white;
+}
+
+/* Footer */
+
+.signup-footer {
+  position: absolute;
+
+  bottom: 20px;
+
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 11px;
+  text-align: center;
+}
+
+/* Animation */
+
+@keyframes signupCardAppear {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+
+@media (max-width: 480px) {
+  .signup-container {
+    padding: 35px 20px;
+  }
+
+  .signup-glass-card {
+    padding: 35px 25px;
+    border-radius: 20px;
+  }
+
+  .signup-header h1 {
+    font-size: 24px;
+  }
+
+  .signup-footer {
+    font-size: 10px;
+  }
+}
