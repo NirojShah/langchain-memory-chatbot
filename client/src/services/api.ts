@@ -104,3 +104,13 @@ export async function deactivateMe() {
     method: 'DELETE',
   });
 }
+
+export async function logout() {
+  const result = await apiRequest('/users/logout', {
+    method: 'POST',
+  });
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('user');
+  return result;
+}
