@@ -87,3 +87,7 @@ export async function login(payload: LoginPayload) {
   localStorage.setItem('user', JSON.stringify(result.user));
   return result;
 }
+
+export async function getMe() {
+  return apiRequest('/users/me');
+}
