@@ -121,3 +121,15 @@ export async function createNewChat(userId: string) {
     body: JSON.stringify({ userId }),
   });
 }
+
+export async function getMyChats(
+  userId: string,
+  page = 1,
+  limit = 10,
+) {
+  const query = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+  return apiRequest(`/chat/my-chats?${query.toString()}`);
+}
