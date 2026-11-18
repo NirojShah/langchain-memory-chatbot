@@ -91,3 +91,10 @@ export async function login(payload: LoginPayload) {
 export async function getMe() {
   return apiRequest('/users/me');
 }
+
+export async function updateMe(payload: UpdateUserPayload) {
+  return apiRequest('/users/me', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
