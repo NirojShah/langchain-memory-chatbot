@@ -1,14 +1,27 @@
 import React, { useState, type FormEvent } from 'react';
+import { login } from '../../services/api';
 import './login.css';
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setError('');
+    setIsSubmitting(true);
 
-    // Add your login API logic here
-    console.log('Login submitted');
+    try {
+      await login({ email, password });
+      window.location.href = '/';
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to sign in');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -29,6 +42,8 @@ const Login: React.FC = () => {
               type="email"
               id="email"
               placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
@@ -41,6 +56,8 @@ const Login: React.FC = () => {
                 type={showPassword ? 'text' : 'password'}
                 id="password"
                 placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
 
@@ -63,8 +80,10 @@ const Login: React.FC = () => {
             <a href="/forgot-password">Forgot Password?</a>
           </div>
 
-          <button type="submit" className="login-button">
-            Sign In
+          {error && <p role="alert">{error}</p>}
+
+          <button type="submit" className="login-button" disabled={isSubmitting}>
+            {isSubmitting ? 'Signing In...' : 'Sign In'}
             <span>→</span>
           </button>
         </form>
