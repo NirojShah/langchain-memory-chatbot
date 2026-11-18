@@ -144,3 +144,17 @@ export async function createNewMessage(
     body: JSON.stringify({ chatId, userId, content }),
   });
 }
+
+export async function getMessages(
+  chatId: string,
+  page = 1,
+  limit = 10,
+) {
+  const query = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+  return apiRequest(
+    `/message/messages/${encodeURIComponent(chatId)}?${query.toString()}`,
+  );
+}
