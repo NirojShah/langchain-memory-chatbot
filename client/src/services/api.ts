@@ -98,3 +98,9 @@ export async function updateMe(payload: UpdateUserPayload) {
     body: JSON.stringify(payload),
   });
 }
+
+export async function deactivateMe() {
+  return apiRequest('/users/me', {
+    method: 'DELETE',
+  });
+}
