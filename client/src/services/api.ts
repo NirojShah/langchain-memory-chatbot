@@ -131,5 +131,16 @@ export async function getMyChats(
     page: String(page),
     limit: String(limit),
   });
-  return apiRequest(`/chat/my-chats?${query.toString()}`);
+  return apiRequest(`/chat/my-chats/${encodeURIComponent(userId)}?${query.toString()}`);
+}
+
+export async function createNewMessage(
+  chatId: string,
+  userId: string,
+  content: string,
+) {
+  return apiRequest('/message/new-message', {
+    method: 'POST',
+    body: JSON.stringify({ chatId, userId, content }),
+  });
 }
