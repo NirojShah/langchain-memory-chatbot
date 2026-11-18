@@ -158,3 +158,8 @@ export async function getMessages(
     `/message/messages/${encodeURIComponent(chatId)}?${query.toString()}`,
   );
 }
+
+export const newChat = createNewChat;
+export const myChats = getMyChats;
+export const newMessage = createNewMessage;
+export const myMessages = getMessages;
