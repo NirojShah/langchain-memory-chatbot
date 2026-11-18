@@ -71,3 +71,19 @@ export async function register(payload: RegisterPayload) {
     body: JSON.stringify(payload),
   });
 }
+
+export async function login(payload: LoginPayload) {
+  const result = await apiRequest<{
+    accessToken: string;
+    refreshToken: string;
+    user: { id: string; userName: string; email: string };
+  }>('/users/login', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+  localStorage.setItem('accessToken', result.accessToken);
+  localStorage.setItem('refreshToken', result.refreshToken);
+  localStorage.setItem('user', JSON.stringify(result.user));
+  return result;
+}
