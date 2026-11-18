@@ -13,7 +13,7 @@ const chatRoutes: FastifyPluginAsync = async (app) => {
     app.get<{
         Params: { userId: string },
         Querystring: { page: number, limit: number }
-    }>("/my-chats", chatController.myChats)
+    }>("/my-chats/:userId", chatController.myChats)
 }
 
 export default chatRoutes
