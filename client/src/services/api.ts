@@ -114,3 +114,10 @@ export async function logout() {
   localStorage.removeItem('user');
   return result;
 }
+
+export async function createNewChat(userId: string) {
+  return apiRequest('/chat/new-chat', {
+    method: 'POST',
+    body: JSON.stringify({ userId }),
+  });
+}
