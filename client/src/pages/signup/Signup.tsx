@@ -1,4 +1,5 @@
 import React, { useState, type FormEvent } from 'react';
+import { register } from '../../services/api';
 import './signup.css';
 
 interface ISignupForm {
@@ -11,6 +12,8 @@ interface ISignupForm {
 const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState<ISignupForm>({
     userName: '',
@@ -28,11 +31,11 @@ const Signup: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
+      setError('Passwords do not match!');
       return;
     }
 
@@ -42,8 +45,17 @@ const Signup: React.FC = () => {
       password: formData.password,
     };
 
-    // Add your signup API logic here
-    console.log('Signup submitted:', signupPayload);
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      await register(signupPayload);
+      window.location.href = '/login';
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to create account');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -150,8 +162,10 @@ const Signup: React.FC = () => {
             </div>
           </div>
 
-          <button type="submit" className="signup-button">
-            Create Account
+          {error && <p role="alert">{error}</p>}
+
+          <button type="submit" className="signup-button" disabled={isSubmitting}>
+            {isSubmitting ? 'Creating Account...' : 'Create Account'}
             <span>→</span>
           </button>
 
