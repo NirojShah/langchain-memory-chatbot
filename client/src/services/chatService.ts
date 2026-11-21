@@ -75,3 +75,25 @@ export async function createChat(userId: string): Promise<ChatSummary> {
     updatedAt: formatChatTime(chat.updatedAt || chat.createdAt),
   };
 }
+
+export async function getChats(
+  userId: string,
+  page = 1,
+  limit = 10,
+): Promise<ChatSummary[]> {
+  const chats = await getMyChats(userId, page, limit) as ApiChat[];
+
+  return chats.map((chat, index) => {
+    const id = chat._id || chat.id;
+    if (!id) {
+      throw new Error(`Chat at index ${index} did not include an id`);
+    }
+
+    return {
+      id,
+      title: chat.title || `Conversation ${index + 1}`,
+      preview: 'Continue your conversation',
+      updatedAt: formatChatTime(chat.updatedAt || chat.createdAt),
+    };
+  });
+}
