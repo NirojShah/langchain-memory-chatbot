@@ -97,3 +97,22 @@ export async function getChats(
     };
   });
 }
+
+export async function createMessage(
+  chatId: string,
+  userId: string,
+  content: string,
+): Promise<ChatMessage> {
+  const message = await createNewMessage(chatId, userId, content) as ApiMessage;
+  const id = message._id || message.id;
+
+  if (!id) {
+    throw new Error('The message response did not include an id');
+  }
+
+  return {
+    id,
+    role: 'user',
+    content: message.content,
+  };
+}
