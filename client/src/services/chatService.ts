@@ -1,3 +1,10 @@
+import {
+  createNewChat,
+  getMyChats,
+  createNewMessage,
+  getMessages as getChatMessages,
+} from './api';
+
 export interface ChatSummary {
   id: string;
   title: string;
@@ -11,30 +18,60 @@ export interface ChatMessage {
   content: string;
 }
 
-export async function createChat(_userId: string): Promise<ChatSummary> {
-  throw new Error('Chat API integration is pending');
+interface ApiChat {
+  _id?: string;
+  id?: string;
+  title?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export async function getChats(
-  _userId: string,
-  _page = 1,
-  _limit = 10,
-): Promise<ChatSummary[]> {
-  throw new Error('Chat API integration is pending');
+interface ApiMessage {
+  _id?: string;
+  id?: string;
+  content: string;
+  sender?: string;
+  userId?: string;
+  createdAt?: string;
 }
 
-export async function createMessage(
-  _chatId: string,
-  _userId: string,
-  _content: string,
-): Promise<ChatMessage> {
-  throw new Error('Chat API integration is pending');
+function formatChatTime(value?: string): string {
+  if (!value) {
+    return 'Now';
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? 'Now'
+    : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export async function getMessages(
-  _chatId: string,
-  _page = 1,
-  _limit = 10,
-): Promise<ChatMessage[]> {
-  throw new Error('Chat API integration is pending');
+function getCurrentUserId(): string {
+  const storedUser = localStorage.getItem('user');
+  if (!storedUser) {
+    return '';
+  }
+
+  try {
+    const user = JSON.parse(storedUser) as { id?: string; _id?: string };
+    return user.id || user._id || '';
+  } catch {
+    return '';
+  }
+}
+
+export async function createChat(userId: string): Promise<ChatSummary> {
+  const chat = await createNewChat(userId) as ApiChat;
+  const id = chat._id || chat.id;
+
+  if (!id) {
+    throw new Error('The chat response did not include an id');
+  }
+
+  return {
+    id,
+    title: chat.title || 'New conversation',
+    preview: 'Start a new message',
+    updatedAt: formatChatTime(chat.updatedAt || chat.createdAt),
+  };
 }
