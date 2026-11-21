@@ -116,3 +116,31 @@ export async function createMessage(
     content: message.content,
   };
 }
+
+export async function getMessages(
+  chatId: string,
+  page = 1,
+  limit = 10,
+): Promise<ChatMessage[]> {
+  const userId = getCurrentUserId();
+  const messages = await getChatMessages(chatId, page, limit) as ApiMessage[];
+
+  return messages
+    .map((message) => {
+      const id = message._id || message.id;
+      if (!id) {
+        throw new Error('A message response did not include an id');
+      }
+
+      return {
+        id,
+        role:
+          message.sender === userId ||
+          (!message.sender && message.userId === userId)
+            ? ('user' as const)
+            : ('assistant' as const),
+        content: message.content,
+      };
+    })
+    .reverse();
+}
