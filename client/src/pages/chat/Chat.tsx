@@ -187,13 +187,13 @@ const Chat: React.FC = () => {
           onSelectChat={handleSelectChat}
         />
 
-        <button type="button" className="chat-profile">
+        <a href="/account" className="chat-profile">
           <span className="chat-profile-avatar">M</span>
           <span className="chat-profile-copy">
             <strong>My Account</strong>
             <small>Personal workspace</small>
           </span>
-        </button>
+        </a>
       </aside>
 
       <section className="chat-workspace">

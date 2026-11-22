@@ -16,6 +16,20 @@ export interface UpdateUserPayload {
   email?: string;
 }
 
+export interface UserProfile {
+  id: string;
+  userName: string;
+  email: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface UpdateUserResponse {
+  message: string;
+  user: Pick<UserProfile, 'id' | 'userName' | 'email' | 'updatedAt'>;
+}
+
 export interface ApiError extends Error {
   status: number;
 }
@@ -88,12 +102,14 @@ export async function login(payload: LoginPayload) {
   return result;
 }
 
-export async function getMe() {
-  return apiRequest('/users/me');
+export async function getMe(): Promise<UserProfile> {
+  return apiRequest<UserProfile>('/users/me');
 }
 
-export async function updateMe(payload: UpdateUserPayload) {
-  return apiRequest('/users/me', {
+export async function updateMe(
+  payload: UpdateUserPayload,
+): Promise<UpdateUserResponse> {
+  return apiRequest<UpdateUserResponse>('/users/me', {
     method: 'PATCH',
     body: JSON.stringify(payload),
   });
