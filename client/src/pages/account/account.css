@@ -1,0 +1,323 @@
+.account-page {
+  min-height: 100vh;
+  padding: 28px clamp(20px, 6vw, 80px) 48px;
+  color: #ffffff;
+  font-family: 'Inter', system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 82% 10%, rgba(99, 102, 241, 0.2), transparent 28rem),
+    linear-gradient(145deg, #17182a 0%, #0d1020 58%, #090b16 100%);
+  box-sizing: border-box;
+}
+
+.account-header {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.account-brand,
+.account-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.account-brand {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.account-brand-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  color: #dbeafe;
+  border: 1px solid rgba(165, 180, 252, 0.28);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.32), rgba(168, 85, 247, 0.18));
+}
+
+.account-back-link {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+}
+
+.account-back-link:hover {
+  color: #ffffff;
+}
+
+.account-content {
+  width: 100%;
+  max-width: 720px;
+  margin: 56px auto 0;
+}
+
+.account-intro {
+  margin-bottom: 26px;
+}
+
+.account-eyebrow {
+  color: #a5b4fc;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.account-intro h1 {
+  margin: 8px 0;
+  color: #ffffff;
+  font-size: clamp(28px, 5vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.account-intro p,
+.account-section-heading p,
+.account-session-card p,
+.account-danger-zone p {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.account-card {
+  margin-bottom: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+.account-loading {
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.account-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.account-avatar {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 700;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #818cf8, #6366f1);
+}
+
+.account-section-heading h2,
+.account-session-card h2,
+.account-danger-zone h2 {
+  margin: 0 0 4px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.account-status {
+  margin-left: auto;
+  padding: 5px 9px;
+  color: #fecaca;
+  font-size: 10px;
+  border-radius: 999px;
+  background: rgba(248, 113, 113, 0.12);
+}
+
+.account-status.is-active {
+  color: #bbf7d0;
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.account-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 14px;
+  padding: 22px 0;
+}
+
+.account-field {
+  display: grid;
+  gap: 8px;
+}
+
+.account-field label {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.account-field input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  color: #ffffff;
+  font: inherit;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.045);
+  box-sizing: border-box;
+}
+
+.account-field input:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.14);
+}
+
+.account-primary-button,
+.account-secondary-button,
+.account-danger-button {
+  min-height: 40px;
+  padding: 0 15px;
+  color: #ffffff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.account-primary-button {
+  justify-self: start;
+  grid-column: 1 / -1;
+  border: 0;
+  background: #6366f1;
+}
+
+.account-primary-button:disabled,
+.account-secondary-button:disabled,
+.account-danger-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.account-metadata {
+  display: flex;
+  gap: 56px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.account-metadata div {
+  display: grid;
+  gap: 5px;
+}
+
+.account-metadata span {
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 10px;
+}
+
+.account-metadata strong {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.account-session-card,
+.account-danger-zone {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.account-secondary-button {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.account-danger-zone {
+  padding: 21px 24px;
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  border-radius: 14px;
+  background: rgba(127, 29, 29, 0.1);
+}
+
+.account-danger-zone p {
+  max-width: 390px;
+  font-size: 11px;
+}
+
+.account-danger-button {
+  flex: 0 0 auto;
+  color: #fecaca;
+  border: 1px solid rgba(248, 113, 113, 0.28);
+  background: rgba(127, 29, 29, 0.2);
+}
+
+.account-alert {
+  margin-bottom: 14px;
+  padding: 11px 13px;
+  font-size: 12px;
+  border-radius: 9px;
+}
+
+.account-alert-error {
+  display: grid;
+  gap: 6px;
+  color: #fecaca;
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  background: rgba(127, 29, 29, 0.18);
+}
+
+.account-alert-error a {
+  color: #c7d2fe;
+}
+
+.account-alert-success {
+  color: #bbf7d0;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  background: rgba(34, 197, 94, 0.08);
+}
+
+@media (max-width: 600px) {
+  .account-page {
+    padding: 20px 16px 32px;
+  }
+
+  .account-content {
+    margin-top: 38px;
+  }
+
+  .account-card {
+    padding: 18px;
+  }
+
+  .account-form {
+    grid-template-columns: 1fr;
+  }
+
+  .account-primary-button {
+    grid-column: auto;
+  }
+
+  .account-metadata {
+    gap: 20px;
+  }
+
+  .account-session-card,
+  .account-danger-zone {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
